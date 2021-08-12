@@ -9,7 +9,6 @@ exports.codeSigningConfig = (profileArn, signingPolicy) => {
             "CodeSigningPolicies" : {
               "UntrustedArtifactOnDeployment" : signingPolicy
             },
-            "Description" : "blabla"
           }
       }
 

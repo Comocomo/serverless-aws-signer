@@ -435,8 +435,12 @@ class ServerlessPlugin {
 
       cloudFormationResources[resourceName] = signingCFTemplate
 
+      // Verifying that only the user's lambdas are signed, and not auto-generated lambdas.
+      const userFunctionNames = Object.values(this.serverless.service.functions).map(func => func.name)
+
       for (let resource in cloudFormationResources){
-        if (cloudFormationResources[resource].Type === 'AWS::Lambda::Function') {
+        if (cloudFormationResources[resource].Type === 'AWS::Lambda::Function' &&
+            userFunctionNames.includes(cloudFormationResources[resource].Properties.FunctionName)) {
           cloudFormationResources[resource].Properties.CodeSigningConfigArn = {"Ref": resourceName}
         }
       }
