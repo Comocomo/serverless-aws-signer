@@ -28,13 +28,17 @@ class ServerlessPlugin {
       },
     };
 
-    this.hooks = {
-      'after:package:createDeploymentArtifacts': () => this.signLambdas().then(this.signLayers.bind(this)),
-      'before:package:finalize': this.addSigningConfigurationToCloudFormation.bind(this),
-      'signer:sign': this.signLambdas.bind(this),
-      'before:remove:remove': this.removeResources.bind(this)
-      // 'signer:updateCloudFormation': this.addSigningConfigurationToCloudFormation.bind(this)
-    };
+    // This package is uploading the signed package to S3 and fetching signer data from AWS on serverless package command
+    // Since on CI process when only opening PR we have stub credentials we do not want to check this mechanism
+    if (!process.env.CI_ONLY_PACKAGE){
+        this.hooks = {
+        'after:package:createDeploymentArtifacts': () => this.signLambdas().then(this.signLayers.bind(this)),
+        'before:package:finalize': this.addSigningConfigurationToCloudFormation.bind(this),
+        'signer:sign': this.signLambdas.bind(this),
+        'before:remove:remove': this.removeResources.bind(this)
+        // 'signer:updateCloudFormation': this.addSigningConfigurationToCloudFormation.bind(this)
+      };
+    }
 
     const globalConfigSchemaProperties = {
       source: {
